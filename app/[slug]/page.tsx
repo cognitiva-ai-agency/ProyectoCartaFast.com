@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import { Category, MenuItem, Theme, ScheduledDiscount } from '@/types'
 import { Spinner } from '@/components/ui'
 import { getCurrency } from '@/lib/currencies'
-import { DEMO_THEMES } from '@/lib/demo-data'
+import { DEFAULT_THEMES } from '@/lib/default-themes'
 import { getIngredientById, Ingredient, getDishDietType, MASTER_INGREDIENTS } from '@/lib/ingredients'
 import { applyScheduledDiscounts } from '@/lib/scheduled-discounts'
 import { cn } from '@/lib/utils'
@@ -72,7 +72,7 @@ export default function PublicMenuPage() {
         const itemsWithDiscounts = applyScheduledDiscounts(items, discounts, themeData.timezone || 'America/Santiago')
 
         // Find theme configuration
-        const currentTheme = DEMO_THEMES.find(t => t.id === themeData.themeId) || DEMO_THEMES[0]
+        const currentTheme = DEFAULT_THEMES.find(t => t.id === themeData.themeId) || DEFAULT_THEMES[0]
 
         setMenuData({
           categories: categories.filter((cat: Category) => cat.is_visible),
@@ -148,7 +148,7 @@ export default function PublicMenuPage() {
       style={{
         backgroundColor: themeColors.background || '#F2F2F7',
         fontFamily: themeTypography.fontFamily || '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
-        fontSize: themeTypography.fontSize?.base || '16px'
+        fontSize: themeTypography.fontSize?.body || '16px'
       }}
     >
       <header
@@ -190,7 +190,7 @@ export default function PublicMenuPage() {
               <h1
                 className="text-3xl font-bold"
                 style={{
-                  fontFamily: themeTypography.headingFont || themeTypography.fontFamily,
+                  fontFamily: themeTypography.fontFamily,
                   fontSize: themeTypography.fontSize?.heading || '32px',
                   color: themeColors.primary || themeColors.text || '#1C1C1E'
                 }}
@@ -225,7 +225,7 @@ export default function PublicMenuPage() {
 
       <main
         className="max-w-5xl mx-auto px-4"
-        style={{ paddingTop: themeSpacing.sectionGap || '48px', paddingBottom: themeSpacing.sectionGap || '48px' }}
+        style={{ paddingTop: themeSpacing.large || '48px', paddingBottom: themeSpacing.large || '48px' }}
       >
         {menuData.categories.length === 0 ? (
           <div className="text-center py-20">
@@ -334,7 +334,7 @@ function CategorySection({ category, items, currency, defaultExpanded, theme, cu
         </div>
       </div>
       {isExpanded && (
-        <div style={{ padding: themeSpacing.cardPadding || '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ padding: themeSpacing.medium || '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {sortedItems.map((item) => (<MenuItemCard key={item.id} item={item} currency={currency} theme={theme} customIngredients={customIngredients} />))}
         </div>
       )}

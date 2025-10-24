@@ -62,6 +62,7 @@ export interface Theme {
   id: string
   name: string
   description: string
+  is_active?: boolean
   preview_image?: string
   config: ThemeConfig
 }
@@ -77,16 +78,16 @@ export interface ThemeConfig {
   }
   typography: {
     fontFamily: string
-    headingFont: string
     fontSize: {
-      base: string
       heading: string
+      body: string
       small: string
     }
   }
   spacing: {
-    cardPadding: string
-    sectionGap: string
+    small: string
+    medium: string
+    large: string
   }
   borderRadius: string
   currency?: string // Currency code (EUR, USD, MXN, etc.)

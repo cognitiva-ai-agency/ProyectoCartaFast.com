@@ -26,12 +26,24 @@ CREATE TABLE restaurants (
   currency VARCHAR(10) DEFAULT 'CLP',
   timezone VARCHAR(100) DEFAULT 'America/Santiago',
   is_demo BOOLEAN DEFAULT false,
+  is_admin BOOLEAN DEFAULT false,
+  ingredient_categories JSONB DEFAULT '{
+    "CARNES": "Carnes",
+    "PESCADOS": "Pescados y Mariscos",
+    "VEGETALES": "Vegetales",
+    "LACTEOS": "Lácteos",
+    "CEREALES": "Cereales y Granos",
+    "FRUTAS": "Frutas",
+    "CONDIMENTOS": "Condimentos y Especias",
+    "OTROS": "Otros"
+  }'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Index for faster slug lookups
 CREATE INDEX idx_restaurants_slug ON restaurants(slug);
+CREATE INDEX idx_restaurants_is_admin ON restaurants(is_admin);
 
 -- =====================================================
 -- TABLE: categories
@@ -91,13 +103,13 @@ CREATE INDEX idx_items_promotion ON items(restaurant_id, is_promotion) WHERE is_
 
 -- =====================================================
 -- TABLE: ingredients
--- Available ingredients for each restaurant
+-- Available ingredients for each restaurant (with human-readable IDs)
 -- =====================================================
 CREATE TABLE ingredients (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id VARCHAR(255) PRIMARY KEY, -- Human-readable slug (e.g., 'carne-de-vacuno', 'papa-frita')
   restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-  category VARCHAR(255) NOT NULL,
-  name VARCHAR(255) NOT NULL,
+  category VARCHAR(255) NOT NULL, -- Category key in lowercase (e.g., 'carnes', 'pescados')
+  name VARCHAR(255) NOT NULL, -- Display name (e.g., 'Carne de Vacuno')
   is_allergen BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -115,7 +127,7 @@ CREATE INDEX idx_ingredients_category ON ingredients(restaurant_id, category);
 CREATE TABLE item_ingredients (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
-  ingredient_id UUID NOT NULL REFERENCES ingredients(id) ON DELETE CASCADE,
+  ingredient_id VARCHAR(255) NOT NULL REFERENCES ingredients(id) ON DELETE CASCADE,
   is_optional BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(item_id, ingredient_id)
@@ -132,7 +144,7 @@ CREATE INDEX idx_item_ingredients_ingredient ON item_ingredients(ingredient_id);
 CREATE TABLE unavailable_ingredients (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-  ingredient_id UUID NOT NULL REFERENCES ingredients(id) ON DELETE CASCADE,
+  ingredient_id VARCHAR(255) NOT NULL REFERENCES ingredients(id) ON DELETE CASCADE,
   reason VARCHAR(255),
   marked_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(restaurant_id, ingredient_id)

@@ -55,10 +55,13 @@ export async function GET(
     const bannerConfig: BannerConfig = {
       enabled: banner.is_visible,
       message: banner.title + (banner.subtitle ? ` - ${banner.subtitle}` : ''),
-      backgroundColor: '#FF9500', // Default - can be stored in DB later
-      textColor: '#FFFFFF', // Default - can be stored in DB later
+      // Read colors from database (with fallback to defaults)
+      backgroundColor: banner.background_color || '#FF9500',
+      textColor: banner.text_color || '#FFFFFF',
       updated_at: banner.updated_at
     }
+
+    console.log('✅ Banner loaded from DB:', bannerConfig)
 
     return NextResponse.json(bannerConfig)
   } catch (err) {
@@ -106,8 +109,12 @@ export async function POST(
       restaurant_id: restaurant.id,
       title: banner.message || 'Ofertas especiales',
       subtitle: null,
-      is_visible: banner.enabled || false
+      is_visible: banner.enabled || false,
+      background_color: banner.backgroundColor || '#FF9500',
+      text_color: banner.textColor || '#FFFFFF'
     }
+
+    console.log('💾 Saving banner to DB:', bannerData)
 
     if (existingBanner) {
       // Update existing banner
@@ -117,12 +124,13 @@ export async function POST(
         .eq('id', existingBanner.id)
 
       if (updateError) {
-        console.error('Error updating banner:', updateError)
+        console.error('❌ Error updating banner:', updateError)
         return NextResponse.json(
-          { error: 'Failed to save banner' },
+          { error: 'Failed to save banner: ' + updateError.message },
           { status: 500 }
         )
       }
+      console.log('✅ Banner updated successfully')
     } else {
       // Insert new banner
       const { error: insertError } = await supabase
@@ -130,12 +138,13 @@ export async function POST(
         .insert(bannerData)
 
       if (insertError) {
-        console.error('Error inserting banner:', insertError)
+        console.error('❌ Error inserting banner:', insertError)
         return NextResponse.json(
-          { error: 'Failed to save banner' },
+          { error: 'Failed to save banner: ' + insertError.message },
           { status: 500 }
         )
       }
+      console.log('✅ Banner created successfully')
     }
 
     return NextResponse.json({

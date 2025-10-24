@@ -22,45 +22,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // DEMO MODE: Commented out - restoran1 is now a production restaurant
-    // Uncomment this block if you need a demo mode in the future
-    /*
-    if (slug === 'restoran1' && password === '123456') {
-      console.log('✅ Demo credentials detected!')
-
-      const sessionData = {
-        restaurantId: 'demo-restaurant-id',
-        slug: 'restoran1',
-        ownerId: 'demo-owner-id',
-        name: 'Restaurante Demo',
-        isDemo: true,
-      }
-
-      console.log('📝 Creating demo session:', sessionData)
-
-      const cookieStore = cookies()
-      cookieStore.set('session', JSON.stringify(sessionData), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        path: '/',
-      })
-
-      console.log('✅ Demo session created successfully')
-
-      return NextResponse.json({
-        success: true,
-        isDemo: true,
-        restaurant: {
-          id: 'demo-restaurant-id',
-          name: 'Restaurante Demo',
-          slug: 'restoran1',
-        },
-      })
-    }
-    */
-
+    // Authentication flow: Supabase → Filesystem fallback
     console.log('⚠️ Checking production database...')
 
     // PRODUCTION MODE: Check Supabase first, fallback to filesystem

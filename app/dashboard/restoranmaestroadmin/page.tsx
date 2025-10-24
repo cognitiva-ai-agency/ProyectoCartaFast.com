@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth'
 import RestaurantList from '@/components/admin/RestaurantList'
 import RestaurantFormModal from '@/components/admin/RestaurantFormModal'
 import { Button } from '@/components/ui/Button'
+import { Toast } from '@/components/ui/Toast'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 interface Restaurant {
   id: string
@@ -17,6 +19,11 @@ interface Restaurant {
   updated_at: string
 }
 
+interface ToastMessage {
+  message: string
+  type: 'success' | 'error' | 'info'
+}
+
 export default function AdminMasterPanel() {
   const router = useRouter()
   const { session, isLoading: authLoading } = useAuth()
@@ -24,6 +31,22 @@ export default function AdminMasterPanel() {
   const [isLoading, setIsLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [toast, setToast] = useState<ToastMessage | null>(null)
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    onConfirm: () => void
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  })
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type })
+  }
 
   // Verificar que sea admin
   useEffect(() => {
@@ -80,7 +103,9 @@ export default function AdminMasterPanel() {
       // Recargar lista
       await loadRestaurants()
       setShowCreateModal(false)
+      showToast(`Restaurante "${data.name}" creado correctamente`, 'success')
     } catch (err: any) {
+      showToast(err.message || 'Error al crear restaurante', 'error')
       throw err
     }
   }
@@ -94,37 +119,72 @@ export default function AdminMasterPanel() {
       })
 
       if (!response.ok) {
-        throw new Error('Error al actualizar estado')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al actualizar estado')
       }
 
       // Recargar lista
       await loadRestaurants()
-    } catch (err) {
+      showToast(
+        `Estado actualizado a ${newStatus === 'active' ? 'activo' : 'suspendido'}`,
+        'success'
+      )
+    } catch (err: any) {
       console.error('Error updating status:', err)
-      alert('Error al actualizar el estado del restaurante')
+      showToast(err.message || 'Error al actualizar el estado del restaurante', 'error')
+    }
+  }
+
+  const handleUpdatePassword = async (id: string, newPassword: string) => {
+    try {
+      const response = await fetch(`/api/admin/restaurants/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al actualizar contraseña')
+      }
+
+      // No need to reload list since password is not displayed
+      showToast('Contraseña actualizada correctamente', 'success')
+    } catch (err: any) {
+      console.error('Error updating password:', err)
+      showToast(err.message || 'Error al actualizar la contraseña del restaurante', 'error')
+      throw err
     }
   }
 
   const handleDeleteRestaurant = async (id: string) => {
-    if (!confirm('¿Estás seguro de cancelar este restaurante?')) {
-      return
-    }
+    const restaurant = restaurants.find(r => r.id === id)
 
-    try {
-      const response = await fetch(`/api/admin/restaurants/${id}`, {
-        method: 'DELETE',
-      })
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Cancelar Restaurante',
+      message: `¿Estás seguro de cancelar el restaurante "${restaurant?.name}"? Esta acción cambiará su estado a "cancelado".`,
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`/api/admin/restaurants/${id}`, {
+            method: 'DELETE',
+          })
 
-      if (!response.ok) {
-        throw new Error('Error al eliminar restaurante')
-      }
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Error al eliminar restaurante')
+          }
 
-      // Recargar lista
-      await loadRestaurants()
-    } catch (err) {
-      console.error('Error deleting restaurant:', err)
-      alert('Error al eliminar el restaurante')
-    }
+          // Recargar lista
+          await loadRestaurants()
+          showToast('Restaurante cancelado correctamente', 'success')
+        } catch (err: any) {
+          console.error('Error deleting restaurant:', err)
+          showToast(err.message || 'Error al eliminar el restaurante', 'error')
+        }
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+      },
+    })
   }
 
   if (authLoading || !session?.isAdmin) {
@@ -224,6 +284,7 @@ export default function AdminMasterPanel() {
             restaurants={restaurants}
             isLoading={isLoading}
             onUpdateStatus={handleUpdateStatus}
+            onUpdatePassword={handleUpdatePassword}
             onDelete={handleDeleteRestaurant}
             onRefresh={loadRestaurants}
           />
@@ -237,6 +298,27 @@ export default function AdminMasterPanel() {
           onSubmit={handleCreateRestaurant}
         />
       )}
+
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        onConfirm={confirmDialog.onConfirm}
+        onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+        variant="danger"
+        confirmText="Confirmar"
+        cancelText="Cancelar"
+      />
     </div>
   )
 }

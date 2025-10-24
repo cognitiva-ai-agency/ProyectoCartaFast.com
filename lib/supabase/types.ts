@@ -67,6 +67,8 @@ export interface Restaurant {
   currency: string
   timezone: string
   is_demo: boolean
+  is_admin: boolean
+  ingredient_categories: { [key: string]: string } | null
   created_at: string
   updated_at: string
 }
@@ -136,7 +138,7 @@ export type IngredientUpdate = Partial<IngredientInsert>
 export interface ItemIngredient {
   id: string
   item_id: string
-  ingredient_id: string
+  ingredient_id: string // Now a VARCHAR slug (e.g., 'carne-de-vacuno')
   is_optional: boolean
   created_at: string
 }
@@ -148,7 +150,7 @@ export type ItemIngredientUpdate = Partial<ItemIngredientInsert>
 export interface UnavailableIngredient {
   id: string
   restaurant_id: string
-  ingredient_id: string
+  ingredient_id: string // Now a VARCHAR slug (e.g., 'carne-de-vacuno')
   reason: string | null
   marked_at: string
 }

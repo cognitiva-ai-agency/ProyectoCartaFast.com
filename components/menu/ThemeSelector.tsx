@@ -17,7 +17,7 @@ export interface ThemeSelectorProps {
  */
 export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorProps) {
   const { themes, isLoading: themesLoading } = useThemes()
-  const { currentThemeId, updateTheme, isUpdating } = useRestaurantTheme(restaurantId)
+  const { currentThemeId, updateTheme, refreshTheme, isUpdating } = useRestaurantTheme(restaurantId)
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null)
   const [restaurantName, setRestaurantName] = useState('')
   const [logoUrl, setLogoUrl] = useState('')
@@ -25,6 +25,8 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
   const [logoLoadError, setLogoLoadError] = useState(false)
   const [currency, setCurrency] = useState('CLP')
   const [timezone, setTimezone] = useState('America/Santiago')
+  const [isSaving, setIsSaving] = useState(false)
+  const [savingMessage, setSavingMessage] = useState('')
 
   // Load restaurant info from theme API
   useEffect(() => {
@@ -55,22 +57,43 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
   const handleRestaurantNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
     setRestaurantName(newName)
+  }
 
+  const handleRestaurantNameBlur = async () => {
     try {
-      await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
+      setIsSaving(true)
+      setSavingMessage('Guardando nombre...')
+
+      const response = await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           themeId: currentThemeId,
-          restaurantName: newName,
+          restaurantName,
           logoUrl,
           logoStyle,
           currency,
           timezone
         })
       })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save name')
+      }
+
+      setSavingMessage('Nombre guardado ✓')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 2000)
     } catch (err) {
       console.error('Error saving restaurant name:', err)
+      setSavingMessage('Error al guardar nombre ✗')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 3000)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -79,7 +102,10 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
     setCurrency(newCurrency)
 
     try {
-      await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
+      setIsSaving(true)
+      setSavingMessage('Guardando moneda...')
+
+      const response = await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -91,8 +117,23 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
           timezone
         })
       })
+
+      if (!response.ok) {
+        throw new Error('Failed to save currency')
+      }
+
+      setSavingMessage('Moneda guardada ✓')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 2000)
     } catch (err) {
       console.error('Error saving currency:', err)
+      setSavingMessage('Error al guardar moneda ✗')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 3000)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -101,7 +142,10 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
     setTimezone(newTimezone)
 
     try {
-      await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
+      setIsSaving(true)
+      setSavingMessage('Guardando zona horaria...')
+
+      const response = await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -113,17 +157,34 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
           timezone: newTimezone
         })
       })
+
+      if (!response.ok) {
+        throw new Error('Failed to save timezone')
+      }
+
+      setSavingMessage('Zona horaria guardada ✓')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 2000)
     } catch (err) {
       console.error('Error saving timezone:', err)
+      setSavingMessage('Error al guardar zona horaria ✗')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 3000)
+    } finally {
+      setIsSaving(false)
     }
   }
 
   const handleLogoChange = async (newLogoUrl: string) => {
     setLogoUrl(newLogoUrl)
     setLogoLoadError(false)
+    setIsSaving(true)
+    setSavingMessage('Subiendo logo...')
 
     try {
-      await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
+      const response = await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -135,8 +196,29 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
           timezone
         })
       })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to upload logo')
+      }
+
+      const savedData = await response.json()
+      // Update local state with saved logo URL from Supabase Storage
+      setLogoUrl(savedData.logoUrl || newLogoUrl)
+
+      setSavingMessage('Logo guardado ✓')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 2000)
     } catch (err) {
       console.error('Error saving logo:', err)
+      setSavingMessage('Error al guardar logo ✗')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 3000)
+      alert('Error al subir el logo. Por favor, intenta de nuevo.')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -165,11 +247,52 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
   const handleApplyTheme = async () => {
     if (!selectedTheme) return
 
-    const success = await updateTheme(selectedTheme.id)
-    if (success) {
+    try {
+      setIsSaving(true)
+      setSavingMessage('Aplicando tema...')
+
+      // Use API route to update theme (bypasses RLS issues)
+      const response = await fetch(`/api/restaurants/${restaurantSlug}/theme`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          themeId: selectedTheme.id,
+          restaurantName,
+          logoUrl,
+          logoStyle,
+          currency,
+          timezone
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update theme')
+      }
+
+      // Theme updated successfully
       setSelectedTheme(null)
-      // Reload page to reflect theme changes
-      window.location.reload()
+
+      // Refresh theme from database to update UI immediately
+      if (refreshTheme) {
+        await refreshTheme()
+      }
+
+      setSavingMessage('Tema aplicado ✓')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 2000)
+
+      console.log('✅ Tema aplicado exitosamente')
+    } catch (err) {
+      console.error('❌ Error applying theme:', err)
+      setSavingMessage('Error al aplicar tema ✗')
+      setTimeout(() => {
+        setSavingMessage('')
+      }, 3000)
+      alert('Error al aplicar el tema. Por favor, intenta de nuevo.')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -208,7 +331,19 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
       {/* Restaurant Configuration */}
       <Card>
         <CardHeader>
-          <CardTitle>Información del Restaurante</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Información del Restaurante</CardTitle>
+            {savingMessage && (
+              <div className={cn(
+                "text-sm font-medium px-3 py-1 rounded-full",
+                savingMessage.includes('✓') && "bg-green-100 text-green-700",
+                savingMessage.includes('✗') && "bg-red-100 text-red-700",
+                !savingMessage.includes('✓') && !savingMessage.includes('✗') && "bg-blue-100 text-blue-700"
+              )}>
+                {savingMessage}
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <p className="text-ios-gray-600 mb-4 text-sm">
@@ -222,8 +357,13 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
                 label="Nombre del Restaurante"
                 value={restaurantName}
                 onChange={handleRestaurantNameChange}
+                onBlur={handleRestaurantNameBlur}
                 placeholder="Ej: La Trattoria"
+                disabled={isSaving}
               />
+              <p className="text-xs text-ios-gray-500 mt-1">
+                Los cambios se guardan automáticamente al salir del campo
+              </p>
             </div>
 
             {/* Logo */}
@@ -316,12 +456,20 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
                   </div>
                 </div>
               ) : (
-                <ImageUploader
-                  value=""
-                  onChange={handleLogoChange}
-                  label=""
-                  placeholder="Sube el logo de tu restaurante"
-                />
+                <div>
+                  <ImageUploader
+                    value=""
+                    onChange={handleLogoChange}
+                    label=""
+                    placeholder={isSaving ? "Subiendo logo..." : "Sube el logo de tu restaurante"}
+                  />
+                  {isSaving && (
+                    <div className="mt-2 flex items-center gap-2 text-sm text-ios-blue">
+                      <Spinner size="sm" />
+                      <span>Subiendo a Supabase Storage...</span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -333,7 +481,8 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
               <select
                 value={currency}
                 onChange={handleCurrencyChange}
-                className="w-full px-4 py-2 border border-ios-gray-300 rounded-ios-lg focus:outline-none focus:ring-2 focus:ring-ios-blue focus:border-transparent text-ios-gray-900"
+                disabled={isSaving}
+                className="w-full px-4 py-2 border border-ios-gray-300 rounded-ios-lg focus:outline-none focus:ring-2 focus:ring-ios-blue focus:border-transparent text-ios-gray-900 disabled:bg-ios-gray-100 disabled:cursor-not-allowed"
               >
                 <option value="CLP">Peso Chileno (CLP)</option>
                 <option value="EUR">Euro (EUR)</option>
@@ -358,7 +507,8 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
               <select
                 value={timezone}
                 onChange={handleTimezoneChange}
-                className="w-full px-4 py-2 border border-ios-gray-300 rounded-ios-lg focus:outline-none focus:ring-2 focus:ring-ios-blue focus:border-transparent text-ios-gray-900"
+                disabled={isSaving}
+                className="w-full px-4 py-2 border border-ios-gray-300 rounded-ios-lg focus:outline-none focus:ring-2 focus:ring-ios-blue focus:border-transparent text-ios-gray-900 disabled:bg-ios-gray-100 disabled:cursor-not-allowed"
               >
                 <option value="America/Santiago">Santiago de Chile (GMT-3)</option>
                 <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
@@ -412,13 +562,14 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
                 <Button
                   variant="ghost"
                   onClick={() => setSelectedTheme(null)}
-                  disabled={isUpdating}
+                  disabled={isSaving}
                 >
                   Cancelar
                 </Button>
                 <Button
                   onClick={handleApplyTheme}
-                  isLoading={isUpdating}
+                  isLoading={isSaving}
+                  disabled={isSaving}
                   size="lg"
                 >
                   Aplicar Tema
@@ -428,19 +579,6 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
           </CardContent>
         </Card>
       )}
-
-      {/* Preview Link */}
-      <div className="bg-ios-gray-50 rounded-ios-lg p-6 text-center">
-        <p className="text-sm text-ios-gray-600 mb-3">
-          💡 <strong>Consejo:</strong> Abre tu menú público en otra pestaña para ver los cambios en tiempo real
-        </p>
-        <Button
-          variant="outline"
-          onClick={() => window.open(`/${restaurantId}`, '_blank')}
-        >
-          Ver Menú Público
-        </Button>
-      </div>
     </div>
   )
 }

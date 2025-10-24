@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { cookies } from 'next/headers'
 import { Session } from '@/lib/auth'
+import bcrypt from 'bcryptjs'
 
 /**
  * PATCH /api/admin/restaurants/[id]
@@ -9,9 +10,13 @@ import { Session } from '@/lib/auth'
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    // Resolve params (Next.js 14 compatibility)
+    const params = await Promise.resolve(context.params)
+    const id = params.id
+
     // Verificar sesión admin
     const cookieStore = cookies()
     const sessionCookie = cookieStore.get('session')
@@ -28,8 +33,6 @@ export async function PATCH(
         { status: 403 }
       )
     }
-
-    const id = params.id
     const body = await request.json()
     const { name, slug, password, subscription_status } = body
 
@@ -50,7 +53,6 @@ export async function PATCH(
 
     // Si hay nueva contraseña, hashearla
     if (password) {
-      const bcrypt = require('bcryptjs')
       updates.password_hash = await bcrypt.hash(password, 10)
     }
 
@@ -100,9 +102,13 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    // Resolve params (Next.js 14 compatibility)
+    const params = await Promise.resolve(context.params)
+    const id = params.id
+
     // Verificar sesión admin
     const cookieStore = cookies()
     const sessionCookie = cookieStore.get('session')
@@ -119,8 +125,6 @@ export async function DELETE(
         { status: 403 }
       )
     }
-
-    const id = params.id
 
     // Soft delete: cambiar a cancelled
     const supabase = createAdminClient()

@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { Toast } from '@/components/ui/Toast'
 
 interface Restaurant {
   id: string
@@ -12,10 +14,16 @@ interface Restaurant {
   updated_at: string
 }
 
+interface ToastMessage {
+  message: string
+  type: 'success' | 'error' | 'info'
+}
+
 interface RestaurantListProps {
   restaurants: Restaurant[]
   isLoading: boolean
   onUpdateStatus: (id: string, newStatus: string) => Promise<void>
+  onUpdatePassword: (id: string, newPassword: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onRefresh: () => Promise<void>
 }
@@ -24,9 +32,39 @@ export default function RestaurantList({
   restaurants,
   isLoading,
   onUpdateStatus,
+  onUpdatePassword,
   onDelete,
   onRefresh,
 }: RestaurantListProps) {
+  const [editingPasswordId, setEditingPasswordId] = useState<string | null>(null)
+  const [newPassword, setNewPassword] = useState('')
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
+  const [toast, setToast] = useState<ToastMessage | null>(null)
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type })
+  }
+
+  const handlePasswordUpdate = async (id: string) => {
+    if (!newPassword || newPassword.length < 6) {
+      showToast('La contraseña debe tener al menos 6 caracteres', 'error')
+      return
+    }
+
+    setIsUpdatingPassword(true)
+    try {
+      await onUpdatePassword(id, newPassword)
+      setEditingPasswordId(null)
+      setNewPassword('')
+      showToast('Contraseña actualizada correctamente', 'success')
+    } catch (error) {
+      showToast('Error al actualizar contraseña', 'error')
+      console.error(error)
+    } finally {
+      setIsUpdatingPassword(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-ios-lg shadow-ios p-8">
@@ -55,8 +93,16 @@ export default function RestaurantList({
   }
 
   return (
-    <div className="bg-white rounded-ios-lg shadow-ios overflow-hidden">
-      <div className="overflow-x-auto">
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <div className="bg-white rounded-ios-lg shadow-ios overflow-hidden">
+        <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-ios-gray-200">
           <thead className="bg-ios-gray-50">
             <tr>
@@ -65,6 +111,9 @@ export default function RestaurantList({
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-ios-gray-500 uppercase tracking-wider">
                 URL/Slug
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-ios-gray-500 uppercase tracking-wider">
+                Contraseña
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-ios-gray-500 uppercase tracking-wider">
                 Estado
@@ -108,6 +157,44 @@ export default function RestaurantList({
                   <div className="text-sm text-ios-gray-900 font-mono">
                     /{restaurant.slug}
                   </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {editingPasswordId === restaurant.id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Nueva contraseña"
+                        className="px-2 py-1 text-sm border border-ios-gray-300 rounded-ios focus:ring-2 focus:ring-ios-blue focus:border-ios-blue"
+                        disabled={isUpdatingPassword}
+                      />
+                      <button
+                        onClick={() => handlePasswordUpdate(restaurant.id)}
+                        disabled={isUpdatingPassword}
+                        className="px-2 py-1 bg-ios-green text-white text-xs rounded-ios hover:bg-ios-green/90 disabled:opacity-50"
+                      >
+                        {isUpdatingPassword ? '...' : '✓'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingPasswordId(null)
+                          setNewPassword('')
+                        }}
+                        disabled={isUpdatingPassword}
+                        className="px-2 py-1 bg-ios-gray-300 text-ios-gray-700 text-xs rounded-ios hover:bg-ios-gray-400 disabled:opacity-50"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setEditingPasswordId(restaurant.id)}
+                      className="px-3 py-1 bg-ios-blue/10 text-ios-blue text-xs rounded-ios hover:bg-ios-blue/20 transition-colors"
+                    >
+                      🔒 Cambiar
+                    </button>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <StatusBadge status={restaurant.subscription_status} />
@@ -176,6 +263,7 @@ export default function RestaurantList({
         </table>
       </div>
     </div>
+    </>
   )
 }
 

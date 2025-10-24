@@ -39,16 +39,16 @@ export const DEMO_THEME: Theme = {
     },
     typography: {
       fontFamily: '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
-      headingFont: '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
       fontSize: {
-        base: '16px',
         heading: '32px',
+        body: '16px',
         small: '14px',
       },
     },
     spacing: {
-      cardPadding: '24px',
-      sectionGap: '48px',
+      small: '8px',
+      medium: '24px',
+      large: '48px',
     },
     borderRadius: '12px',
     currency: 'EUR',
@@ -72,16 +72,16 @@ export const DEMO_THEMES: Theme[] = [
       },
       typography: {
         fontFamily: '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
-        headingFont: '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
         fontSize: {
-          base: '16px',
           heading: '36px',
+          body: '16px',
           small: '14px',
         },
       },
       spacing: {
-        cardPadding: '20px',
-        sectionGap: '40px',
+        small: '8px',
+        medium: '20px',
+        large: '40px',
       },
       borderRadius: '16px',
       currency: 'EUR',
@@ -102,16 +102,16 @@ export const DEMO_THEMES: Theme[] = [
       },
       typography: {
         fontFamily: 'Georgia, serif',
-        headingFont: '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
         fontSize: {
-          base: '17px',
           heading: '34px',
+          body: '17px',
           small: '15px',
         },
       },
       spacing: {
-        cardPadding: '28px',
-        sectionGap: '44px',
+        small: '10px',
+        medium: '28px',
+        large: '44px',
       },
       borderRadius: '10px',
       currency: 'EUR',
@@ -132,16 +132,16 @@ export const DEMO_THEMES: Theme[] = [
       },
       typography: {
         fontFamily: '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
-        headingFont: '-apple-system, BlinkMacSystemFont, SF Pro Display, sans-serif',
         fontSize: {
-          base: '16px',
           heading: '38px',
+          body: '16px',
           small: '14px',
         },
       },
       spacing: {
-        cardPadding: '24px',
-        sectionGap: '56px',
+        small: '8px',
+        medium: '24px',
+        large: '56px',
       },
       borderRadius: '14px',
       currency: 'EUR',

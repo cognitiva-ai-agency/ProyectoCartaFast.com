@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Theme } from '@/types'
+import { DEFAULT_THEMES } from '@/lib/default-themes'
 
 /**
  * Hook to fetch available themes
- * NOTE: This hook requires Supabase to be configured.
+ * Uses hardcoded themes if Supabase is not configured or themes table is empty
  */
 export function useThemes() {
   const [themes, setThemes] = useState<Theme[]>([])
@@ -27,21 +28,32 @@ export function useThemes() {
         setIsLoading(true)
         setError(null)
 
-        if (!supabase) {
-          throw new Error('Supabase not configured')
+        // Try to load from Supabase first
+        if (supabase) {
+          try {
+            const { data, error: fetchError } = await supabase
+              .from('themes')
+              .select('*')
+              .eq('is_active', true)
+              .order('name', { ascending: true })
+
+            // If we got themes from DB, use them
+            if (!fetchError && data && data.length > 0) {
+              setThemes(data)
+              setIsLoading(false)
+              return
+            }
+          } catch (dbError) {
+            console.log('Could not load themes from DB, using defaults')
+          }
         }
 
-        const { data, error: fetchError } = await supabase
-          .from('themes')
-          .select('*')
-          .eq('is_active', true)
-          .order('name', { ascending: true })
-
-        if (fetchError) throw fetchError
-
-        setThemes(data || [])
+        // Fallback to default hardcoded themes
+        setThemes(DEFAULT_THEMES)
       } catch (err: any) {
         console.error('Error fetching themes:', err)
+        // On error, still provide default themes
+        setThemes(DEFAULT_THEMES)
         setError(err.message)
       } finally {
         setIsLoading(false)
@@ -74,30 +86,31 @@ export function useRestaurantTheme(restaurantId: string) {
     // Supabase not configured
   }
 
-  useEffect(() => {
-    const fetchRestaurantTheme = async () => {
-      try {
-        if (!supabase) {
-          return
-        }
-
-        const { data, error: fetchError } = await supabase
-          .from('restaurants')
-          .select('theme_id')
-          .eq('id', restaurantId)
-          .single()
-
-        if (fetchError) throw fetchError
-
-        setCurrentThemeId(data.theme_id)
-      } catch (err: any) {
-        console.error('Error fetching restaurant theme:', err)
-        setError(err.message)
+  // Función para recargar el tema desde la base de datos
+  const refreshTheme = async () => {
+    try {
+      if (!supabase) {
+        return
       }
-    }
 
+      const { data, error: fetchError } = await supabase
+        .from('restaurants')
+        .select('theme_id')
+        .eq('id', restaurantId)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      setCurrentThemeId(data.theme_id)
+    } catch (err: any) {
+      console.error('Error fetching restaurant theme:', err)
+      setError(err.message)
+    }
+  }
+
+  useEffect(() => {
     if (restaurantId) {
-      fetchRestaurantTheme()
+      refreshTheme()
     }
   }, [restaurantId])
 
@@ -131,6 +144,7 @@ export function useRestaurantTheme(restaurantId: string) {
   return {
     currentThemeId,
     updateTheme,
+    refreshTheme,
     isUpdating,
     error,
   }

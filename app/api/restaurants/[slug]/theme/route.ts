@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { saveRestaurantImage, deleteRestaurantImage } from '@/lib/filesystem'
 import { createAdminClient } from '@/lib/supabase/admin'
+import {
+  uploadImage,
+  deleteImage,
+  generateImagePath,
+  getExtensionFromDataUrl,
+  getContentTypeFromDataUrl
+} from '@/lib/supabase/storage'
 
 interface ThemeConfig {
   themeId: string
@@ -92,43 +98,68 @@ export async function POST(
     // Process logo image if it's base64
     let logoUrl = theme.logoUrl
     if (logoUrl && logoUrl.startsWith('data:image/')) {
-      // Delete old logo if it exists and is different
+      console.log('📤 Uploading new logo to Supabase Storage...')
+
+      // Delete old logo from Supabase Storage if it exists
       if (existingRestaurant.logo_url && existingRestaurant.logo_url !== logoUrl) {
-        deleteRestaurantImage(slug, existingRestaurant.logo_url)
+        console.log('🗑️  Deleting old logo from Supabase Storage')
+        await deleteImage(existingRestaurant.logo_url)
       }
 
-      // Save new logo with ID "logo"
-      logoUrl = saveRestaurantImage(slug, 'logo', logoUrl)
+      // Upload new logo to Supabase Storage
+      const extension = getExtensionFromDataUrl(logoUrl)
+      const contentType = getContentTypeFromDataUrl(logoUrl)
+      const imagePath = generateImagePath(slug, 'logos', 'logo', extension)
+
+      const publicUrl = await uploadImage(imagePath, logoUrl, contentType)
+
+      if (!publicUrl) {
+        console.error('❌ Failed to upload logo to Supabase Storage')
+        return NextResponse.json(
+          { error: 'Failed to upload logo image' },
+          { status: 500 }
+        )
+      }
+
+      console.log('✅ Logo uploaded successfully:', publicUrl)
+      logoUrl = publicUrl
     }
     // If logo was removed
     else if (existingRestaurant.logo_url && (!logoUrl || logoUrl === '')) {
-      deleteRestaurantImage(slug, existingRestaurant.logo_url)
+      console.log('🗑️  Removing logo from Supabase Storage')
+      await deleteImage(existingRestaurant.logo_url)
       logoUrl = null
     }
 
     // Update restaurant with new theme
+    const updateData = {
+      name: theme.restaurantName,
+      theme_id: theme.themeId,
+      currency: theme.currency,
+      timezone: theme.timezone || 'America/Santiago',
+      logo_url: logoUrl || null,
+      logo_style: theme.logoStyle || 'circular',
+      updated_at: new Date().toISOString()
+    }
+
+    console.log('💾 Updating restaurant in Supabase:', updateData)
+
     const { data: updatedRestaurant, error: updateError } = await supabase
       .from('restaurants')
-      .update({
-        name: theme.restaurantName,
-        theme_id: theme.themeId,
-        currency: theme.currency,
-        timezone: theme.timezone || 'America/Santiago',
-        logo_url: logoUrl || null,
-        logo_style: theme.logoStyle || 'circular',
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', existingRestaurant.id)
       .select('name, theme_id, currency, timezone, logo_url, logo_style, updated_at')
       .single()
 
     if (updateError) {
-      console.error('Error saving theme:', updateError)
+      console.error('❌ Error saving theme to database:', updateError)
       return NextResponse.json(
-        { error: 'Failed to save theme' },
+        { error: 'Failed to save theme: ' + updateError.message },
         { status: 500 }
       )
     }
+
+    console.log('✅ Restaurant updated successfully:', updatedRestaurant)
 
     const themeConfig: ThemeConfig = {
       themeId: updatedRestaurant.theme_id,

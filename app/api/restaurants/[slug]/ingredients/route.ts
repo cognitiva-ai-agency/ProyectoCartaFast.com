@@ -72,7 +72,7 @@ export async function GET(
       ingredients: (ingredients || []).map(ing => ({
         id: ing.id,
         name: ing.name,
-        category: ing.category.toUpperCase(), // Convert to uppercase to match original format
+        category: ing.category, // Keep consistent - no case conversion
         isCommonAllergen: ing.is_allergen
       })),
       updated_at: new Date().toISOString()
@@ -133,23 +133,26 @@ export async function POST(
     // Insert new ingredients
     const ingredients = body.ingredients || []
     if (ingredients.length > 0) {
-      // Generate unique IDs for each ingredient
-      const existingIds: string[] = []
+      // Get all existing ingredient IDs from DB to avoid collisions
+      const { data: existingIngredients } = await supabase
+        .from('ingredients')
+        .select('id')
+
+      const existingIds = existingIngredients?.map(i => i.id) || []
 
       const ingredientsToInsert = ingredients.map((ing: any) => {
-        // Use provided ID if it's already a slug (not a UUID)
-        // Otherwise, generate a new slug from the name
+        // Generate slug from name if ID is missing or is a UUID
         let id = ing.id
-        if (!id || id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-          // It's a UUID or missing, generate a slug
+        if (!id || id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) || id.startsWith('custom-')) {
+          // Generate a unique slug
           id = generateIngredientId(ing.name, existingIds)
+          existingIds.push(id)
         }
-        existingIds.push(id)
 
         return {
-          id, // Use the slug as ID
+          id, // Use the slug as ID (e.g., 'carne-de-vacuno')
           restaurant_id: restaurant.id,
-          category: ing.category.toLowerCase(), // Store in lowercase in DB
+          category: ing.category, // Keep consistent - no case conversion
           name: ing.name,
           is_allergen: ing.isCommonAllergen || ing.is_allergen || false
         }
@@ -227,7 +230,7 @@ export async function PUT(
       .from('ingredients')
       .update({
         name: updates.name,
-        category: updates.category.toLowerCase(), // Store in lowercase in DB
+        category: updates.category, // Keep consistent - no case conversion
         is_allergen: updates.isCommonAllergen || updates.is_allergen || false
       })
       .eq('id', id)
@@ -254,7 +257,7 @@ export async function PUT(
       ingredients: (ingredients || []).map(ing => ({
         id: ing.id,
         name: ing.name,
-        category: ing.category.toUpperCase(), // Convert to uppercase to match original format
+        category: ing.category, // Keep consistent - no case conversion
         isCommonAllergen: ing.is_allergen
       })),
       updated_at: new Date().toISOString()
@@ -335,7 +338,7 @@ export async function DELETE(
       ingredients: (ingredients || []).map(ing => ({
         id: ing.id,
         name: ing.name,
-        category: ing.category.toUpperCase(), // Convert to uppercase to match original format
+        category: ing.category, // Keep consistent - no case conversion
         isCommonAllergen: ing.is_allergen
       })),
       updated_at: new Date().toISOString()
