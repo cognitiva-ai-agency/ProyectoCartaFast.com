@@ -28,9 +28,15 @@ export default function DashboardPage({ params }: { params: { slug: string } }) 
       return
     }
 
-    if (!isLoading && session && session.slug !== params.slug) {
+    // Allow admins to access any dashboard
+    if (!isLoading && session && session.isAdmin) {
+      console.log('✅ Admin user, allowed to access any dashboard')
+      return
+    }
+
+    // Non-admin users can only access their own dashboard
+    if (!isLoading && session && !session.isAdmin && session.slug !== params.slug) {
       console.log('⚠️ Wrong dashboard, redirecting to:', `/dashboard/${session.slug}`)
-      // User trying to access wrong dashboard
       router.push(`/dashboard/${session.slug}`)
       return
     }
