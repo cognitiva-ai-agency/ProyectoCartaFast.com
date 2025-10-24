@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { generateIngredientId } from '@/lib/slugify'
 
 interface IngredientsData {
   categories: { [key: string]: string }
@@ -132,12 +133,27 @@ export async function POST(
     // Insert new ingredients
     const ingredients = body.ingredients || []
     if (ingredients.length > 0) {
-      const ingredientsToInsert = ingredients.map((ing: any) => ({
-        restaurant_id: restaurant.id,
-        category: ing.category.toLowerCase(), // Store in lowercase in DB
-        name: ing.name,
-        is_allergen: ing.isCommonAllergen || ing.is_allergen || false
-      }))
+      // Generate unique IDs for each ingredient
+      const existingIds: string[] = []
+
+      const ingredientsToInsert = ingredients.map((ing: any) => {
+        // Use provided ID if it's already a slug (not a UUID)
+        // Otherwise, generate a new slug from the name
+        let id = ing.id
+        if (!id || id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+          // It's a UUID or missing, generate a slug
+          id = generateIngredientId(ing.name, existingIds)
+        }
+        existingIds.push(id)
+
+        return {
+          id, // Use the slug as ID
+          restaurant_id: restaurant.id,
+          category: ing.category.toLowerCase(), // Store in lowercase in DB
+          name: ing.name,
+          is_allergen: ing.isCommonAllergen || ing.is_allergen || false
+        }
+      })
 
       const { data: insertedIngredients, error: insertError } = await supabase
         .from('ingredients')
