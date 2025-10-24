@@ -64,9 +64,82 @@ export async function POST(request: NextRequest) {
     console.log('⚠️ Checking production database...')
 
     // PRODUCTION MODE: Check Supabase first, fallback to filesystem
-    // Only try Supabase if environment variables are configured
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.log('⚠️ Supabase not configured, trying filesystem-based auth...')
+    // Try Supabase if environment variables are configured
+    let supabaseAttempted = false
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      supabaseAttempted = true
+      console.log('✅ Supabase configured, attempting Supabase auth first...')
+
+      try {
+        // Get Supabase admin client
+        const supabase = createAdminClient()
+
+        // Find restaurant by slug
+        const { data: restaurant, error: restaurantError } = await supabase
+          .from('restaurants')
+          .select('id, name, slug, password_hash, subscription_status')
+          .eq('slug', slug)
+          .single()
+
+        if (restaurant && !restaurantError) {
+          console.log('✅ Restaurant found in Supabase')
+
+          if (restaurant.subscription_status === 'cancelled' || restaurant.subscription_status === 'suspended') {
+            return NextResponse.json(
+              { error: 'Esta cuenta está desactivada o suspendida' },
+              { status: 403 }
+            )
+          }
+
+          // Verify password
+          const bcrypt = require('bcryptjs')
+          const isPasswordValid = await bcrypt.compare(password, restaurant.password_hash)
+
+          if (!isPasswordValid) {
+            return NextResponse.json(
+              { error: 'Contraseña incorrecta' },
+              { status: 401 }
+            )
+          }
+
+          // Create session cookie
+          const sessionData = {
+            restaurantId: restaurant.id,
+            slug: restaurant.slug,
+            ownerId: restaurant.id,
+            name: restaurant.name,
+            isDemo: false,
+          }
+
+          const cookieStore = cookies()
+          cookieStore.set('session', JSON.stringify(sessionData), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: '/',
+          })
+
+          return NextResponse.json({
+            success: true,
+            isDemo: false,
+            restaurant: {
+              id: restaurant.id,
+              name: restaurant.name,
+              slug: restaurant.slug,
+            },
+          })
+        } else {
+          console.log('⚠️ Restaurant not found in Supabase, trying filesystem fallback...')
+        }
+      } catch (supabaseError) {
+        console.error('⚠️ Supabase error, trying filesystem fallback:', supabaseError)
+      }
+    }
+
+    // FILESYSTEM FALLBACK: Try filesystem-based auth if Supabase failed or wasn't attempted
+    if (!supabaseAttempted || true) { // Always try filesystem as fallback
+      console.log('⚠️ Trying filesystem-based auth...')
 
       // Filesystem fallback for local development
       // Check if restaurant data exists in filesystem
@@ -145,69 +218,11 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Get Supabase admin client
-    const supabase = createAdminClient()
-
-    // Find restaurant by slug
-    const { data: restaurant, error: restaurantError } = await supabase
-      .from('restaurants')
-      .select('id, name, slug, password_hash, subscription_status')
-      .eq('slug', slug)
-      .single()
-
-    if (restaurantError || !restaurant) {
-      return NextResponse.json(
-        { error: 'Restaurante no encontrado' },
-        { status: 404 }
-      )
-    }
-
-    if (restaurant.subscription_status === 'cancelled' || restaurant.subscription_status === 'suspended') {
-      return NextResponse.json(
-        { error: 'Esta cuenta está desactivada o suspendida' },
-        { status: 403 }
-      )
-    }
-
-    // Verify password
-    const bcrypt = require('bcryptjs')
-    const isPasswordValid = await bcrypt.compare(password, restaurant.password_hash)
-
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: 'Contraseña incorrecta' },
-        { status: 401 }
-      )
-    }
-
-    // Create session cookie
-    const sessionData = {
-      restaurantId: restaurant.id,
-      slug: restaurant.slug,
-      ownerId: restaurant.id, // Using restaurant ID as owner ID for now
-      name: restaurant.name,
-      isDemo: false,
-    }
-
-    // Set secure HTTP-only cookie
-    const cookieStore = cookies()
-    cookieStore.set('session', JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    })
-
-    return NextResponse.json({
-      success: true,
-      isDemo: false,
-      restaurant: {
-        id: restaurant.id,
-        name: restaurant.name,
-        slug: restaurant.slug,
-      },
-    })
+    // If we reached here, authentication failed
+    return NextResponse.json(
+      { error: 'Restaurante no encontrado' },
+      { status: 404 }
+    )
   } catch (error) {
     console.error('❌ Login error:', error)
     console.error('Stack:', error instanceof Error ? error.stack : 'No stack')

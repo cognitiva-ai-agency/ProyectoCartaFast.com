@@ -159,12 +159,18 @@ export function useMenuFilesystem(restaurantSlug: string) {
   const addMenuItem = async (categoryId: string, itemData: Partial<MenuItem>) => {
     const categoryItems = items.filter(i => i.category_id === categoryId)
 
+    const basePrice = itemData.base_price || itemData.price || 0
+    const discountPercentage = itemData.discount_percentage || 0
+
     const newItem: MenuItem = {
       id: `item-${Date.now()}`,
       category_id: categoryId,
       name: itemData.name || 'Nuevo Plato',
       description: itemData.description,
-      price: itemData.price || 0,
+      base_price: basePrice,
+      discount_percentage: discountPercentage,
+      final_price: basePrice * (1 - discountPercentage / 100),
+      price: itemData.price || basePrice, // Legacy field
       image_url: itemData.image_url,
       position: categoryItems.length,
       is_available: true,

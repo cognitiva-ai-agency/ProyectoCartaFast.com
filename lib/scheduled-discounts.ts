@@ -119,7 +119,7 @@ export function calculateDiscountedPrice(
   item: MenuItem,
   discount: ScheduledDiscount
 ): number {
-  const originalPrice = item.price
+  const originalPrice = item.base_price || item.price || 0
   const discountAmount = originalPrice * (discount.discount_percentage / 100)
   return Math.round((originalPrice - discountAmount) * 100) / 100
 }

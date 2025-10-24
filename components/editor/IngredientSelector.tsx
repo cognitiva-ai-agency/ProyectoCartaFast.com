@@ -27,7 +27,7 @@ export function IngredientSelector({
   const [allIngredients, setAllIngredients] = useState<Ingredient[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
   const [newIngredientName, setNewIngredientName] = useState('')
-  const [newIngredientCategory, setNewIngredientCategory] = useState<string>('OTROS')
+  const [newIngredientCategory, setNewIngredientCategory] = useState<keyof typeof INGREDIENT_CATEGORIES>('OTROS')
 
   // Load all ingredients from personalized API
   useEffect(() => {
@@ -165,7 +165,7 @@ export function IngredientSelector({
                 />
                 <select
                   value={newIngredientCategory}
-                  onChange={(e) => setNewIngredientCategory(e.target.value)}
+                  onChange={(e) => setNewIngredientCategory(e.target.value as keyof typeof INGREDIENT_CATEGORIES)}
                   className="px-3 py-2 border border-ios-gray-300 rounded-ios-lg text-sm focus:ring-2 focus:ring-ios-blue focus:border-ios-blue"
                 >
                   {Object.entries(categories).map(([key, label]) => (

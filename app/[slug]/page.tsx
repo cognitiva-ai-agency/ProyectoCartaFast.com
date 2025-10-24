@@ -137,9 +137,9 @@ export default function PublicMenuPage() {
   }
 
   const theme = menuData.theme
-  const themeColors = theme?.config?.colors || {}
-  const themeTypography = theme?.config?.typography || {}
-  const themeSpacing = theme?.config?.spacing || {}
+  const themeColors = (theme?.config?.colors || {}) as Partial<Theme['config']['colors']>
+  const themeTypography = (theme?.config?.typography || {}) as Partial<Theme['config']['typography']>
+  const themeSpacing = (theme?.config?.spacing || {}) as Partial<Theme['config']['spacing']>
   const themeBorderRadius = theme?.config?.borderRadius || '12px'
 
   return (
@@ -276,8 +276,8 @@ function CategorySection({ category, items, currency, defaultExpanded, theme, cu
   const sortedItems = items.sort((a, b) => a.position - b.position)
   if (sortedItems.length === 0) return null
 
-  const themeColors = theme?.config?.colors || {}
-  const themeSpacing = theme?.config?.spacing || {}
+  const themeColors = (theme?.config?.colors || {}) as Partial<Theme['config']['colors']>
+  const themeSpacing = (theme?.config?.spacing || {}) as Partial<Theme['config']['spacing']>
   const themeBorderRadius = theme?.config?.borderRadius || '12px'
 
   return (
@@ -351,15 +351,16 @@ function MenuItemCard({ item, currency, theme, customIngredients }: { item: Menu
     return currencyData.decimals > 0 ? `${formattedInt},${decPart}` : formattedInt
   }
 
-  const themeColors = theme?.config?.colors || {}
+  const themeColors = (theme?.config?.colors || {}) as Partial<Theme['config']['colors']>
   const themeBorderRadius = theme?.config?.borderRadius || '12px'
 
   // Calculate savings and discount percentage
+  const currentPrice = item.base_price || item.price || 0
   const savings = item.is_promotion && item.promotion_price
-    ? item.price - item.promotion_price
+    ? currentPrice - item.promotion_price
     : 0
-  const discountPercentage = item.is_promotion && item.promotion_price
-    ? Math.round((savings / item.price) * 100)
+  const discountPercentage = item.is_promotion && item.promotion_price && currentPrice > 0
+    ? Math.round((savings / currentPrice) * 100)
     : 0
 
   // Calculate diet type for the dish
@@ -451,7 +452,7 @@ function MenuItemCard({ item, currency, theme, customIngredients }: { item: Menu
                 className="text-lg font-bold"
                 style={{ color: item.is_promotion ? '#FF453A' : (themeColors.accent || themeColors.primary) }}
               >
-                {formatPrice(item.is_promotion && item.promotion_price ? item.promotion_price : item.price)}
+                {formatPrice(item.is_promotion && item.promotion_price ? item.promotion_price : currentPrice)}
               </span>
             </div>
 
@@ -459,7 +460,7 @@ function MenuItemCard({ item, currency, theme, customIngredients }: { item: Menu
             {item.is_promotion && item.promotion_price && (
               <div className="flex items-center gap-1">
                 <span className="text-xs line-through" style={{ color: themeColors.textSecondary }}>
-                  {currencyData.symbol} {formatPrice(item.price)}
+                  {currencyData.symbol} {formatPrice(currentPrice)}
                 </span>
               </div>
             )}

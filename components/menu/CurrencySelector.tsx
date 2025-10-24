@@ -43,13 +43,11 @@ export function CurrencySelector({ currentCurrency, onCurrencyChange }: Currency
               value={selectedCurrency}
               onChange={handleChange}
               className="w-full"
-            >
-              {currencies.map((currency) => (
-                <option key={currency.code} value={currency.code}>
-                  {currency.name} ({currency.symbol})
-                </option>
-              ))}
-            </Select>
+              options={currencies.map((currency) => ({
+                value: currency.code,
+                label: `${currency.name} (${currency.symbol})`
+              }))}
+            />
           </div>
 
           {/* Preview */}

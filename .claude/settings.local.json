@@ -29,7 +29,13 @@
       "Bash(node scripts/create-restaurant.js:*)",
       "Bash(npx tsx:*)",
       "Bash(node scripts/check-credentials.js:*)",
-      "Bash(del scriptscheck-credentials.js)"
+      "Bash(del scriptscheck-credentials.js)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(node update-password.js:*)",
+      "Bash(del update-password.js)",
+      "Bash(tasklist:*)",
+      "Bash(timeout /t 3 /nobreak)"
     ],
     "deny": [],
     "ask": []

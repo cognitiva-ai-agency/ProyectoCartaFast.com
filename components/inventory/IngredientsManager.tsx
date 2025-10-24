@@ -29,7 +29,7 @@ export function IngredientsManager({ restaurantSlug }: IngredientsManagerProps) 
 
   // Form states
   const [formName, setFormName] = useState('')
-  const [formCategory, setFormCategory] = useState<string>('OTROS')
+  const [formCategory, setFormCategory] = useState<keyof typeof INGREDIENT_CATEGORIES>('OTROS')
   const [formIsAllergen, setFormIsAllergen] = useState(false)
   const [formDietType, setFormDietType] = useState<'vegan' | 'vegetarian' | 'animal'>('vegan')
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false)
@@ -131,7 +131,7 @@ export function IngredientsManager({ restaurantSlug }: IngredientsManagerProps) 
     const success = await saveCategories(updatedCategories)
 
     if (success) {
-      setFormCategory(generatedKey)
+      setFormCategory(generatedKey as keyof typeof INGREDIENT_CATEGORIES)
       setShowNewCategoryInput(false)
       setNewCategoryKey('')
       setNewCategoryLabel('')
@@ -393,7 +393,7 @@ export function IngredientsManager({ restaurantSlug }: IngredientsManagerProps) 
                   setShowAddForm(true)
                   setShowEditForm(false)
                   setFormName('')
-                  setFormCategory(activeCategory)
+                  setFormCategory(activeCategory as keyof typeof INGREDIENT_CATEGORIES)
                   setFormIsAllergen(false)
                 }}
                 size="sm"
@@ -483,7 +483,7 @@ export function IngredientsManager({ restaurantSlug }: IngredientsManagerProps) 
                     ) : (
                       <select
                         value={formCategory}
-                        onChange={(e) => setFormCategory(e.target.value)}
+                        onChange={(e) => setFormCategory(e.target.value as keyof typeof INGREDIENT_CATEGORIES)}
                         className="w-full px-3 py-2 border border-ios-gray-300 rounded-ios-lg text-sm focus:ring-2 focus:ring-ios-blue focus:border-ios-blue"
                       >
                         {Object.entries(categories).map(([key, label]) => (

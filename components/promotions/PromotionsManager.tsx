@@ -451,7 +451,7 @@ function EditablePromotionItem({
         <div className="flex items-center gap-1">
           <span className="text-xs text-ios-gray-500">{currencyData.symbol}</span>
           <ContentEditable
-            value={isEditingPrice ? String(item.price) : formatPrice(item.price)}
+            value={isEditingPrice ? String(item.price || item.base_price || 0) : formatPrice(item.price || item.base_price || 0)}
             onChange={handlePriceChange}
             onFocus={() => setIsEditingPrice(true)}
             onBlur={() => setIsEditingPrice(false)}
@@ -463,7 +463,7 @@ function EditablePromotionItem({
         {/* Savings Badge */}
         {item.promotion_price && (
           <Badge variant="success" size="sm">
-            Ahorro: {currencyData.symbol} {formatPrice(item.price - item.promotion_price)}
+            Ahorro: {currencyData.symbol} {formatPrice((item.price || item.base_price || 0) - item.promotion_price)}
           </Badge>
         )}
       </div>

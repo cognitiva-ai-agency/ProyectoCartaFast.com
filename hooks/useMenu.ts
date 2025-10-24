@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createSupabaseClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Menu, Category, MenuItem } from '@/types'
 
 /**
@@ -15,13 +15,8 @@ export function useMenu(restaurantId: string) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Create Supabase client lazily
-  let supabase: ReturnType<typeof createSupabaseClient> | null = null
-  try {
-    supabase = createSupabaseClient()
-  } catch (err) {
-    // Supabase not configured - will be caught in fetchMenu
-  }
+  // Create Supabase client
+  const supabase = createClient()
 
   // Fetch menu data
   const fetchMenu = async () => {

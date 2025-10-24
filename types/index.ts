@@ -41,9 +41,9 @@ export interface MenuItem {
   category_id: string
   name: string
   description?: string
-  base_price: number // Base price before discounts
-  discount_percentage: number // Discount percentage (0-100)
-  final_price: number // Calculated price (generated in DB)
+  base_price?: number // Base price before discounts
+  discount_percentage?: number // Discount percentage (0-100)
+  final_price?: number // Calculated price (generated in DB)
   image_url?: string
   position: number // For ordering (maps to sort_order in DB)
   is_available: boolean
@@ -54,7 +54,7 @@ export interface MenuItem {
   updated_at: string
 
   // Legacy fields for backward compatibility
-  price?: number // Use base_price instead
+  price?: number // Use base_price instead (required if base_price not provided)
   promotion_price?: number // Use discount_percentage instead
 }
 

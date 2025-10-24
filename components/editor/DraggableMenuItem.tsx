@@ -48,9 +48,13 @@ export function DraggableMenuItem({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isEditingPrice, setIsEditingPrice] = useState(false)
   const [isEditingDiscount, setIsEditingDiscount] = useState(false)
+  const [isEditingFinalPrice, setIsEditingFinalPrice] = useState(false)
   const [customIngredients, setCustomIngredients] = useState<Ingredient[]>([])
   const [localPrice, setLocalPrice] = useState<string>(String(item.base_price || 0))
   const [localDiscount, setLocalDiscount] = useState<string>(String(item.discount_percentage || 0))
+  const [localFinalPrice, setLocalFinalPrice] = useState<string>(
+    String((item.base_price || 0) * (1 - (item.discount_percentage || 0) / 100))
+  )
 
   // Sync local price with item.base_price when it changes externally (from server)
   // Note: We don't include isEditingPrice in dependencies to avoid resetting
@@ -67,6 +71,14 @@ export function DraggableMenuItem({
       setLocalDiscount(String(item.discount_percentage || 0))
     }
   }, [item.discount_percentage])
+
+  // Sync local final price when base_price or discount_percentage changes
+  useEffect(() => {
+    if (!isEditingFinalPrice) {
+      const calculatedFinalPrice = (item.base_price || 0) * (1 - (item.discount_percentage || 0) / 100)
+      setLocalFinalPrice(String(calculatedFinalPrice))
+    }
+  }, [item.base_price, item.discount_percentage])
 
   // Load custom ingredients
   useEffect(() => {
@@ -130,7 +142,7 @@ export function DraggableMenuItem({
     console.log('💰 DraggableMenuItem - Saving price:', {
       localPrice,
       parsed: price,
-      currentPrice: item.base_price,
+      currentPrice: item.base_price || 0,
       itemId: item.id,
       willUpdate: !isNaN(price) && price !== item.base_price
     })
@@ -155,8 +167,14 @@ export function DraggableMenuItem({
   }
 
   const handleDiscountChange = (newDiscount: string) => {
-    // While editing, just update local state
+    // While editing, update local state and calculate final price
     setLocalDiscount(newDiscount)
+
+    const discount = parseFloat(newDiscount.replace(/[^0-9.]/g, ''))
+    if (!isNaN(discount) && discount >= 0 && discount <= 100) {
+      const calculatedFinalPrice = (item.base_price || 0) * (1 - discount / 100)
+      setLocalFinalPrice(String(calculatedFinalPrice))
+    }
   }
 
   const handleDiscountBlur = () => {
@@ -170,12 +188,53 @@ export function DraggableMenuItem({
     } else if (isNaN(discount) || discount < 0 || discount > 100) {
       // Reset to original if invalid
       setLocalDiscount(String(item.discount_percentage || 0))
+      const calculatedFinalPrice = (item.base_price || 0) * (1 - (item.discount_percentage || 0) / 100)
+      setLocalFinalPrice(String(calculatedFinalPrice))
     }
   }
 
   const handleDiscountFocus = () => {
     setIsEditingDiscount(true)
     setLocalDiscount(String(item.discount_percentage || 0))
+  }
+
+  const handleFinalPriceChange = (newFinalPrice: string) => {
+    // While editing, update local state and calculate discount percentage
+    setLocalFinalPrice(newFinalPrice)
+
+    const finalPrice = parseFloat(newFinalPrice.replace(/[^0-9.]/g, ''))
+    const basePrice = item.base_price || 0
+    if (!isNaN(finalPrice) && finalPrice >= 0 && finalPrice <= basePrice) {
+      // Calculate discount percentage from final price
+      const calculatedDiscount = basePrice > 0 ? ((basePrice - finalPrice) / basePrice) * 100 : 0
+      setLocalDiscount(String(Math.round(calculatedDiscount * 100) / 100)) // Round to 2 decimals
+    }
+  }
+
+  const handleFinalPriceBlur = () => {
+    setIsEditingFinalPrice(false)
+
+    // Parse the final price
+    const finalPrice = parseFloat(localFinalPrice.replace(/[^0-9.]/g, ''))
+    const basePrice = item.base_price || 0
+
+    if (!isNaN(finalPrice) && finalPrice >= 0 && finalPrice <= basePrice && basePrice > 0) {
+      // Calculate discount percentage from final price
+      const calculatedDiscount = ((basePrice - finalPrice) / basePrice) * 100
+
+      // Update the discount percentage (which will automatically update the final price)
+      onUpdate(item.id, { discount_percentage: Math.round(calculatedDiscount * 100) / 100 })
+    } else if (isNaN(finalPrice) || finalPrice < 0 || finalPrice > basePrice) {
+      // Reset to calculated value if invalid
+      const calculatedFinalPrice = basePrice * (1 - (item.discount_percentage || 0) / 100)
+      setLocalFinalPrice(String(calculatedFinalPrice))
+    }
+  }
+
+  const handleFinalPriceFocus = () => {
+    setIsEditingFinalPrice(true)
+    const calculatedFinalPrice = (item.base_price || 0) * (1 - (item.discount_percentage || 0) / 100)
+    setLocalFinalPrice(String(calculatedFinalPrice))
   }
 
   const handleToggleAvailability = () => {
@@ -305,26 +364,46 @@ export function DraggableMenuItem({
             </div>
 
             {item.is_promotion && (
-              <div className="flex items-center gap-1 bg-ios-red/5 px-3 py-2 rounded-lg border-2 border-ios-red/20 hover:border-ios-red/40 transition-all">
-                <span className="text-xs font-medium text-ios-gray-600">-</span>
-                <ContentEditable
-                  value={isEditingDiscount ? localDiscount : String(item.discount_percentage || 0)}
-                  onChange={handleDiscountChange}
-                  onFocus={handleDiscountFocus}
-                  onBlur={handleDiscountBlur}
-                  placeholder="0"
-                  className={cn(
-                    "text-base font-bold text-ios-red min-w-[40px]",
-                    isEditingDiscount && "bg-white px-2 py-1 rounded border-2 border-ios-red shadow-sm"
-                  )}
-                />
-                <span className="text-xs font-medium text-ios-gray-600">% = {currencyData.symbol}</span>
-                <span className="text-base font-semibold text-ios-red min-w-[60px]">
-                  {formatPriceForDisplay(
-                    item.base_price * (1 - (item.discount_percentage || 0) / 100),
-                    currencyData.decimals
-                  )}
-                </span>
+              <div className="flex flex-col gap-2">
+                {/* Edición por Porcentaje */}
+                <div className="flex items-center gap-1 bg-ios-red/5 px-3 py-2 rounded-lg border-2 border-ios-red/20 hover:border-ios-red/40 transition-all">
+                  <span className="text-xs font-medium text-ios-gray-600">Descuento:</span>
+                  <ContentEditable
+                    value={isEditingDiscount ? localDiscount : String(item.discount_percentage || 0)}
+                    onChange={handleDiscountChange}
+                    onFocus={handleDiscountFocus}
+                    onBlur={handleDiscountBlur}
+                    placeholder="0"
+                    className={cn(
+                      "text-base font-bold text-ios-red min-w-[40px]",
+                      isEditingDiscount && "bg-white px-2 py-1 rounded border-2 border-ios-red shadow-sm"
+                    )}
+                  />
+                  <span className="text-xs font-medium text-ios-gray-600">%</span>
+                </div>
+
+                {/* Edición por Precio Final */}
+                <div className="flex items-center gap-1 bg-ios-green/5 px-3 py-2 rounded-lg border-2 border-ios-green/20 hover:border-ios-green/40 transition-all">
+                  <span className="text-xs font-medium text-ios-gray-600">Precio final: {currencyData.symbol}</span>
+                  <ContentEditable
+                    value={
+                      isEditingFinalPrice
+                        ? localFinalPrice
+                        : formatPriceForDisplay(
+                            parseFloat(localFinalPrice),
+                            currencyData.decimals
+                          )
+                    }
+                    onChange={handleFinalPriceChange}
+                    onFocus={handleFinalPriceFocus}
+                    onBlur={handleFinalPriceBlur}
+                    placeholder="0"
+                    className={cn(
+                      "text-base font-bold text-ios-green min-w-[60px]",
+                      isEditingFinalPrice && "bg-white px-2 py-1 rounded border-2 border-ios-green shadow-sm"
+                    )}
+                  />
+                </div>
               </div>
             )}
           </div>
