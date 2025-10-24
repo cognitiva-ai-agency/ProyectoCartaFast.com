@@ -6,6 +6,7 @@ export interface Session {
   ownerId: string
   name: string
   isDemo?: boolean
+  isAdmin?: boolean
 }
 
 /**

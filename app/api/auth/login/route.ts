@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         // Find restaurant by slug
         const { data: restaurant, error: restaurantError } = await supabase
           .from('restaurants')
-          .select('id, name, slug, password_hash, subscription_status')
+          .select('id, name, slug, password_hash, subscription_status, is_admin')
           .eq('slug', slug)
           .single()
 
@@ -109,6 +109,7 @@ export async function POST(request: NextRequest) {
             ownerId: restaurant.id,
             name: restaurant.name,
             isDemo: false,
+            isAdmin: restaurant.is_admin || false,
           }
 
           const cookieStore = cookies()
@@ -123,6 +124,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({
             success: true,
             isDemo: false,
+            isAdmin: restaurant.is_admin || false,
             restaurant: {
               id: restaurant.id,
               name: restaurant.name,
