@@ -17,7 +17,7 @@ export interface ThemeSelectorProps {
  */
 export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorProps) {
   const { themes, isLoading: themesLoading } = useThemes()
-  const { currentThemeId, updateTheme, refreshTheme, isUpdating } = useRestaurantTheme(restaurantId)
+  const [currentThemeId, setCurrentThemeId] = useState<string | null>(null)
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null)
   const [restaurantName, setRestaurantName] = useState('')
   const [logoUrl, setLogoUrl] = useState('')
@@ -32,7 +32,7 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
   useEffect(() => {
     const loadTheme = async () => {
       try {
-        const res = await fetch(`/api/restaurants/${restaurantSlug}/theme`)
+        const res = await fetch(`/api/restaurants/${restaurantSlug}/theme`, { cache: 'no-store' })
         if (res.ok) {
           const themeData = await res.json()
           setRestaurantName(themeData.restaurantName || '')
@@ -40,7 +40,9 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
           setLogoStyle(themeData.logoStyle || 'circular')
           setCurrency(themeData.currency || 'CLP')
           setTimezone(themeData.timezone || 'America/Santiago')
+          setCurrentThemeId(themeData.themeId || null)
           setLogoLoadError(false)
+          console.log('✅ Theme loaded:', themeData.themeId)
         }
       } catch (err) {
         console.error('Error loading theme:', err)
@@ -270,20 +272,18 @@ export function ThemeSelector({ restaurantId, restaurantSlug }: ThemeSelectorPro
         throw new Error(errorData.error || 'Failed to update theme')
       }
 
-      // Theme updated successfully
-      setSelectedTheme(null)
+      const savedData = await response.json()
 
-      // Refresh theme from database to update UI immediately
-      if (refreshTheme) {
-        await refreshTheme()
-      }
+      // Update local state immediately
+      setCurrentThemeId(selectedTheme.id)
+      setSelectedTheme(null)
 
       setSavingMessage('Tema aplicado ✓')
       setTimeout(() => {
         setSavingMessage('')
       }, 2000)
 
-      console.log('✅ Tema aplicado exitosamente')
+      console.log('✅ Tema aplicado exitosamente:', selectedTheme.id)
     } catch (err) {
       console.error('❌ Error applying theme:', err)
       setSavingMessage('Error al aplicar tema ✗')
