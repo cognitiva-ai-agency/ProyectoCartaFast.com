@@ -1,0 +1,550 @@
+{
+  "categories": {
+    "CARNES": "Proteínas",
+    "ALCOHOLES": "Alcoholes",
+    "VEGETALES": "Vegetales"
+  },
+  "ingredients": [
+    {
+      "id": "carne-vacuno",
+      "name": "Carne de Vacuno",
+      "category": "CARNES",
+      "isCommonAllergen": false
+    },
+    {
+      "id": "carne-cerdo",
+      "name": "Carne de Cerdo",
+      "category": "CARNES"
+    },
+    {
+      "id": "pollo",
+      "name": "Pollo",
+      "category": "CARNES"
+    },
+    {
+      "id": "pavo",
+      "name": "Pavo",
+      "category": "CARNES"
+    },
+    {
+      "id": "cordero",
+      "name": "Cordero",
+      "category": "CARNES"
+    },
+    {
+      "id": "conejo",
+      "name": "Conejo",
+      "category": "CARNES"
+    },
+    {
+      "id": "jamon-iberico",
+      "name": "Jamón Ibérico",
+      "category": "CARNES"
+    },
+    {
+      "id": "jamon-serrano",
+      "name": "Jamón Serrano",
+      "category": "CARNES"
+    },
+    {
+      "id": "chorizo",
+      "name": "Chorizo",
+      "category": "CARNES"
+    },
+    {
+      "id": "salchicha",
+      "name": "Salchicha",
+      "category": "CARNES"
+    },
+    {
+      "id": "salmon",
+      "name": "Salmón",
+      "category": "PESCADOS",
+      "isCommonAllergen": false
+    },
+    {
+      "id": "atun",
+      "name": "Atún",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "lubina",
+      "name": "Lubina",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "merluza",
+      "name": "Merluza",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "bacalao",
+      "name": "Bacalao",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "dorada",
+      "name": "Dorada",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "camaron",
+      "name": "Camarón",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "langostino",
+      "name": "Langostino",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "calamar",
+      "name": "Calamar",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "pulpo",
+      "name": "Pulpo",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "mejillon",
+      "name": "Mejillón",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "almeja",
+      "name": "Almeja",
+      "category": "PESCADOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "lechuga",
+      "name": "Lechuga",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "tomate",
+      "name": "Tomate",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "cebolla",
+      "name": "Cebolla",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "ajo",
+      "name": "Ajo",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "pimiento",
+      "name": "Pimiento",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "aji",
+      "name": "Ají",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "zanahoria",
+      "name": "Zanahoria",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "papa",
+      "name": "Papa",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "patata",
+      "name": "Patata",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "berenjena",
+      "name": "Berenjena",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "calabacin",
+      "name": "Calabacín",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "espinaca",
+      "name": "Espinaca",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "brocoli",
+      "name": "Brócoli",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "coliflor",
+      "name": "Coliflor",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "champiñon",
+      "name": "Champiñón",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "setas",
+      "name": "Setas",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "esparrago",
+      "name": "Espárrago",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "aguacate",
+      "name": "Aguacate",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "judias-verdes",
+      "name": "Judías Verdes",
+      "category": "VEGETALES"
+    },
+    {
+      "id": "leche",
+      "name": "Leche",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "nata",
+      "name": "Nata",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "mantequilla",
+      "name": "Mantequilla",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "queso-manchego",
+      "name": "Queso Manchego",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "queso-parmesano",
+      "name": "Queso Parmesano",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "queso-mozzarella",
+      "name": "Queso Mozzarella",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "queso-azul",
+      "name": "Queso Azul",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "queso-cabra",
+      "name": "Queso de Cabra",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "queso-crema",
+      "name": "Queso Crema",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "mascarpone",
+      "name": "Mascarpone",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "yogur",
+      "name": "Yogur",
+      "category": "LACTEOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "arroz",
+      "name": "Arroz",
+      "category": "CEREALES"
+    },
+    {
+      "id": "arroz-arborio",
+      "name": "Arroz Arborio",
+      "category": "CEREALES"
+    },
+    {
+      "id": "pasta",
+      "name": "Pasta",
+      "category": "CEREALES",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "pan",
+      "name": "Pan",
+      "category": "CEREALES",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "harina",
+      "name": "Harina",
+      "category": "CEREALES",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "quinoa",
+      "name": "Quinoa",
+      "category": "CEREALES"
+    },
+    {
+      "id": "avena",
+      "name": "Avena",
+      "category": "CEREALES"
+    },
+    {
+      "id": "huevo",
+      "name": "Huevo",
+      "category": "CEREALES",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "aceite-oliva",
+      "name": "Aceite de Oliva",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "vinagre",
+      "name": "Vinagre",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "sal",
+      "name": "Sal",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "pimienta",
+      "name": "Pimienta",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "oregano",
+      "name": "Orégano",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "albahaca",
+      "name": "Albahaca",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "romero",
+      "name": "Romero",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "tomillo",
+      "name": "Tomillo",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "perejil",
+      "name": "Perejil",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "cilantro",
+      "name": "Cilantro",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "comino",
+      "name": "Comino",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "paprika",
+      "name": "Paprika",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "azafran",
+      "name": "Azafrán",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "mostaza",
+      "name": "Mostaza",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "salsa-soja",
+      "name": "Salsa de Soja",
+      "category": "CONDIMENTOS"
+    },
+    {
+      "id": "mayonesa",
+      "name": "Mayonesa",
+      "category": "CONDIMENTOS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "limon",
+      "name": "Limón",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "naranja",
+      "name": "Naranja",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "manzana",
+      "name": "Manzana",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "fresa",
+      "name": "Fresa",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "frutos-rojos",
+      "name": "Frutos Rojos",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "higos",
+      "name": "Higos",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "platano",
+      "name": "Plátano",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "uva",
+      "name": "Uva",
+      "category": "FRUTAS"
+    },
+    {
+      "id": "cafe",
+      "name": "Café",
+      "category": "OTROS"
+    },
+    {
+      "id": "chocolate",
+      "name": "Chocolate",
+      "category": "OTROS"
+    },
+    {
+      "id": "cacao",
+      "name": "Cacao",
+      "category": "OTROS"
+    },
+    {
+      "id": "vainilla",
+      "name": "Vainilla",
+      "category": "OTROS"
+    },
+    {
+      "id": "azucar",
+      "name": "Azúcar",
+      "category": "OTROS"
+    },
+    {
+      "id": "miel",
+      "name": "Miel",
+      "category": "OTROS"
+    },
+    {
+      "id": "trufa",
+      "name": "Trufa",
+      "category": "OTROS"
+    },
+    {
+      "id": "agua",
+      "name": "Agua",
+      "category": "OTROS"
+    },
+    {
+      "id": "vino-tinto",
+      "name": "Vino Tinto",
+      "category": "OTROS"
+    },
+    {
+      "id": "vino-blanco",
+      "name": "Vino Blanco",
+      "category": "OTROS"
+    },
+    {
+      "id": "cerveza",
+      "name": "Cerveza",
+      "category": "OTROS"
+    },
+    {
+      "id": "bizcochos",
+      "name": "Bizcochos",
+      "category": "OTROS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "galletas",
+      "name": "Galletas",
+      "category": "OTROS",
+      "isCommonAllergen": true
+    },
+    {
+      "id": "custom-1761247822034",
+      "name": "Pichula Nacho",
+      "category": "OTROS",
+      "isCommonAllergen": false
+    },
+    {
+      "id": "custom-1761247839197",
+      "name": "Concha a la parmesana",
+      "category": "PESCADOS",
+      "isCommonAllergen": false
+    },
+    {
+      "id": "custom-1761250708845",
+      "name": "Vino Tinto",
+      "category": "ALCOHOLES",
+      "isCommonAllergen": false
+    },
+    {
+      "id": "custom-1761251193498",
+      "name": "Piscola",
+      "category": "ALCOHOLES",
+      "isCommonAllergen": false
+    }
+  ],
+  "updated_at": "2025-10-23T20:26:33.543Z"
+}

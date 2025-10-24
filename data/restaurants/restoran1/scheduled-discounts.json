@@ -1,0 +1,26 @@
+{
+  "discounts": [
+    {
+      "id": "discount-1761253482087",
+      "restaurant_id": "restoran1",
+      "name": "Happy Hour",
+      "category_id": "cat-1761235565377",
+      "discount_percentage": 50,
+      "days_of_week": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "start_time": "17:00",
+      "end_time": "21:00",
+      "is_active": false,
+      "created_at": "2025-10-23T21:04:42.087Z",
+      "updated_at": "2025-10-23T23:07:12.710Z"
+    }
+  ],
+  "updated_at": "2025-10-23T23:07:12.736Z"
+}

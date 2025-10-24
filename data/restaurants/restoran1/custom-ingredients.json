@@ -1,0 +1,17 @@
+{
+  "ingredients": [
+    {
+      "id": "custom-1761247822034",
+      "name": "Pichula Nacho",
+      "category": "OTROS",
+      "isCommonAllergen": false
+    },
+    {
+      "id": "custom-1761247839197",
+      "name": "Concha a la parmesana",
+      "category": "PESCADOS",
+      "isCommonAllergen": false
+    }
+  ],
+  "updated_at": "2025-10-23T19:30:39.228Z"
+}

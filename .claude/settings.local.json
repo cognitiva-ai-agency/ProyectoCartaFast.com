@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\")",
+      "Bash(npm install:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(node -e:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout 5 npm run dev:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(if exist .next rmdir /s /q .next)",
+      "Bash(tree:*)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(pkill:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(npx kill-port:*)",
+      "Bash(powershell -Command \"Get-Content ''F:\\proyectos_programacion\\menuscarta.com\\data\\restoran1\\categories.json'' -Head 20\")",
+      "Bash(copy \"F:\\proyectos_programacion\\menuscarta.com\\data\\restoran1\\categories.json\" \"F:\\proyectos_programacion\\menuscarta.com\\data\\restoran1\\categories.json.backup\")",
+      "Bash(powershell -Command:*)",
+      "Read(//c/Users/oscar_francisco/Downloads/**)",
+      "Bash(node sync-categories.js:*)",
+      "Bash(del sync-categories.js)",
+      "Bash(node verify-structure.js:*)",
+      "Bash(del verify-structure.js)",
+      "Bash(curl:*)",
+      "Bash(node scripts/create-restaurant.js:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node scripts/check-credentials.js:*)",
+      "Bash(del scriptscheck-credentials.js)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

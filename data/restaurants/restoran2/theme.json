@@ -1,0 +1,9 @@
+{
+  "themeId": null,
+  "currency": "CLP",
+  "restaurantName": "Restorán 2",
+  "logoUrl": "/api/restaurants/restoran2/images/logo.jpeg",
+  "logoStyle": "none",
+  "timezone": "America/Santiago",
+  "updated_at": "2025-10-23T23:41:10.900Z"
+}

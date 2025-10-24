@@ -1,0 +1,9 @@
+{
+  "themeId": "demo-theme-warm",
+  "currency": "CLP",
+  "restaurantName": "Dr. Gadget",
+  "logoUrl": "/api/restaurants/restoran1/images/logo.jpeg",
+  "logoStyle": "none",
+  "timezone": "America/Santiago",
+  "updated_at": "2025-10-23T23:10:20.612Z"
+}

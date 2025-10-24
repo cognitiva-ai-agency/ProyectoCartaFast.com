@@ -1,0 +1,217 @@
+[
+  {
+    "id": "item-1761231480533",
+    "category_id": "cat-1761231448904",
+    "name": "Nombre del Plato categoría 2",
+    "description": "Descripción Nombre del Plato categoría 2",
+    "price": 12000,
+    "image_url": "/api/restaurants/restoran1/images/item-1761231480533.png",
+    "position": 0,
+    "is_available": true,
+    "is_promotion": false,
+    "created_at": "2025-10-23T14:58:00.533Z",
+    "updated_at": "2025-10-23T14:58:13.693Z",
+    "ingredients": [
+      "lechuga",
+      "tomate"
+    ]
+  },
+  {
+    "id": "item-1761231327093",
+    "category_id": "cat-1761088081317",
+    "name": "Plato prueba 1",
+    "description": "DescripciónDescripciónDescripción",
+    "price": 18000,
+    "image_url": "/api/restaurants/restoran1/images/item-1761231327093.png",
+    "position": 0,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "carne-vacuno",
+      "carne-cerdo",
+      "pollo"
+    ],
+    "created_at": "2025-10-23T14:55:27.093Z",
+    "updated_at": "2025-10-23T14:59:44.926Z"
+  },
+  {
+    "id": "item-1761232210221",
+    "category_id": "cat-1761232172389",
+    "name": "Tabla de Quesos",
+    "description": "Descripción Tabla de Quesos",
+    "price": 15000,
+    "position": 0,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "queso-parmesano",
+      "queso-cabra",
+      "lechuga"
+    ],
+    "created_at": "2025-10-23T15:10:10.221Z",
+    "updated_at": "2025-10-23T21:32:46.887Z",
+    "image_url": "/api/restaurants/restoran1/images/item-1761232210221.png"
+  },
+  {
+    "id": "item-1761235689760",
+    "category_id": "cat-1761235565377",
+    "name": "Vino tinto",
+    "description": "rico vino tinto",
+    "price": 6000,
+    "image_url": "/api/restaurants/restoran1/images/item-1761235689760.png",
+    "position": 0,
+    "is_available": true,
+    "is_promotion": true,
+    "ingredients": [
+      "vino-tinto"
+    ],
+    "created_at": "2025-10-23T16:08:09.760Z",
+    "updated_at": "2025-10-23T19:21:52.541Z",
+    "promotion_price": 5000
+  },
+  {
+    "id": "item-1761236401452",
+    "category_id": "demo-cat-2",
+    "name": "Paella Valenciana p2",
+    "description": "descripción Paella Valenciana p2",
+    "price": 9000,
+    "image_url": "/api/restaurants/restoran1/images/item-1761236401452.png",
+    "position": 1,
+    "is_available": true,
+    "is_promotion": true,
+    "created_at": "2025-10-23T16:20:01.452Z",
+    "updated_at": "2025-10-23T19:23:01.505Z",
+    "ingredients": [
+      "carne-vacuno",
+      "carne-cerdo",
+      "ajo",
+      "zanahoria"
+    ],
+    "promotion_price": 6000
+  },
+  {
+    "id": "item-1761236585787",
+    "category_id": "demo-cat-1",
+    "name": "plato p4 (ensalada césar)",
+    "description": "descripción plato p4",
+    "price": 11000,
+    "image_url": "/api/restaurants/restoran1/images/item-1761236585787.png",
+    "position": 1,
+    "is_available": true,
+    "is_promotion": true,
+    "ingredients": [
+      "leche",
+      "mantequilla",
+      "aceite-oliva",
+      "pimienta",
+      "carne-vacuno"
+    ],
+    "created_at": "2025-10-23T16:23:05.787Z",
+    "updated_at": "2025-10-23T23:05:19.953Z",
+    "promotion_price": 9000
+  },
+  {
+    "id": "item-1761234125002",
+    "category_id": "cat-1761234101606",
+    "name": "Paella Valenciana",
+    "description": "descripción categoría de prueba 2",
+    "price": 6000,
+    "image_url": "/api/restaurants/restoran1/images/item-1761234125002.png",
+    "position": 0,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "carne-vacuno",
+      "lechuga",
+      "tomate"
+    ],
+    "created_at": "2025-10-23T15:42:05.002Z",
+    "updated_at": "2025-10-23T19:22:07.911Z"
+  },
+  {
+    "id": "item-1761237163387",
+    "category_id": "cat-1761234101606",
+    "name": "Lubina al Horno",
+    "description": "descripción Lubina al Horno",
+    "price": 19000,
+    "image_url": "/api/restaurants/restoran1/images/item-1761237163387.png",
+    "position": 1,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "lubina",
+      "arroz"
+    ],
+    "created_at": "2025-10-23T16:32:43.387Z",
+    "updated_at": "2025-10-23T19:09:46.250Z"
+  },
+  {
+    "id": "item-1761236362002",
+    "category_id": "cat-1761234101606",
+    "name": "plato prueba 1",
+    "description": "descripción plato prueba 1",
+    "price": 5600,
+    "image_url": "/api/restaurants/restoran1/images/item-1761236362002.png",
+    "position": 2,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "carne-vacuno",
+      "jamon-serrano",
+      "queso-manchego"
+    ],
+    "created_at": "2025-10-23T16:19:22.002Z",
+    "updated_at": "2025-10-23T19:09:46.250Z"
+  },
+  {
+    "id": "item-1761247122055",
+    "category_id": "cat-1761235565377",
+    "name": "Vino blanco",
+    "description": "desc vino",
+    "price": 5000,
+    "position": 1,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "vino-blanco"
+    ],
+    "created_at": "2025-10-23T19:18:42.055Z",
+    "updated_at": "2025-10-23T21:06:38.838Z",
+    "image_url": "/api/restaurants/restoran1/images/item-1761247122055.png"
+  },
+  {
+    "id": "item-1761247875424",
+    "category_id": "demo-cat-1",
+    "name": "prueba plato personalizado",
+    "description": "desc prueba plato personalizado",
+    "price": 9000,
+    "position": 1,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "mejillon",
+      "custom-1761247822034",
+      "custom-1761247839197"
+    ],
+    "created_at": "2025-10-23T19:31:15.424Z",
+    "updated_at": "2025-10-23T23:09:54.139Z",
+    "image_url": "/api/restaurants/restoran1/images/item-1761247875424.png"
+  },
+  {
+    "id": "item-1761251713115",
+    "category_id": "cat-1761235565377",
+    "name": "Piscola",
+    "description": "Piscola",
+    "price": 6000,
+    "position": 2,
+    "is_available": true,
+    "is_promotion": false,
+    "ingredients": [
+      "custom-1761251786911",
+      "custom-1761251193498"
+    ],
+    "created_at": "2025-10-23T20:35:13.115Z",
+    "updated_at": "2025-10-23T20:37:53.503Z",
+    "image_url": "/api/restaurants/restoran1/images/item-1761251713115.png"
+  }
+]
